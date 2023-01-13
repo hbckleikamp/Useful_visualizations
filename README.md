@@ -1,23 +1,24 @@
 # Useful_visualizations
 
 Collection of visualization scripts:
--Sanky16S_top10.py
 
-Shared_abundances.py
+-Sanky16S_top10.py: Custom Multiple Sankey diagram based on table input
 
-alpha_diversity_line.py
+-Shared_abundances.py: Stacked bar chart.
 
-bias trees.py
+-alpha_diversity_line.py: Alpha diversity with error bars and shaded area
 
-db_hom_node_circle.py
+-bias trees.py: Custom tree diagrams
 
-key_genera_category_pie.py
+db_hom_node_circle.py: Custom cirular tree diagrams
 
-metabolic_heatmap.py
+key_genera_category_pie.py: Pie chards
 
-overexpression.py
+metabolic_heatmap.py: heatmap
 
-perc_change.py
+overexpression.py: bar chart colored according to variable
 
-tailingsurf.py
+perc_change.py: bar chart colored according to variable
+
+tailingsurf.py: 3d plots rendered online in Plotly
 
