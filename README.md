@@ -22,3 +22,4 @@ perc_change.py: bar chart colored according to variable
 
 tailingsurf.py: 3d plots rendered online in Plotly
 
+taxbar.py grouped stacked bar plots
