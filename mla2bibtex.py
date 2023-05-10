@@ -115,11 +115,29 @@ for line in lines.loc[:,0]:
         bibs.append(items[np.argmax(np.array(sims))])
         #pick most similar entry
 
+headers = {
+    'Accept': 'application/x-bibtex;q=0.5',
+}
 
+
+#%%
+btex=[]
+for ix,bib in enumerate(bibs):
+    print(ix)
+    btex.append(requests.get(bib.get("URL"), headers=headers).text) 
+    
+#%%
 with io.open(output_file, 'w', encoding = "utf-8") as bibfile:
-    for bib in bibs:
-        bibfile.write("{}\n".format(bib))
-          
+    bibfile.write("\n".join(btex)+"\n")
+
+         
+        
+
+
+
+
+
+
   
             #%%    
     # if not found:
