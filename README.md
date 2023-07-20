@@ -1,6 +1,10 @@
 # Useful_visualizations
 
-Collection of visualization scripts:
+Backup Collection of useful scripts:
+
+-taxonomy_mapping_freq.py : Maps NCBI to GTDB taxonomy
+
+-mla2bibtex: automated bibtex downloader based on mla type citation inputs
 
 -Sanky16S_top10.py: Custom Multiple Sankey diagram based on table input
 
