@@ -10,6 +10,10 @@ Created on Thu May  4 16:17:03 2023
 #Source: https://github.com/fphammerle/pubmed-bibtex/blob/9cd3a7c057dbddd74d6a2147451a70c2b7f0c350/pubmed_bibtex/__init__.py#L59
 
 
+#then convert you bibtex to text with an online converter:
+    #https://www.vertopal.com/en/convert/bib-bibtex-to-txt#:~:text=To%20change%20BIB%20BIBTEX%20format%20to%20TXT%2C%20upload%20your%20BIB,the%20converted%20TXT%20file%20afterward.
+    #https://asouqi.github.io/bibtex-converter/
+
 import requests
 import numpy as np
 import xml.etree.ElementTree as ET
@@ -18,6 +22,14 @@ import calendar
 import io
 import pandas as pd
 from unidecode import unidecode
+
+#%% change directory to script directory (should work on windows and mac)
+import os
+from pathlib import Path
+from inspect import getsourcefile
+os.chdir(str(Path(os.path.abspath(getsourcefile(lambda:0))).parents[0]))
+print(os.getcwd())
+
 
 
 
