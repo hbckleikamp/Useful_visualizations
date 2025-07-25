@@ -1,0 +1,126 @@
+#%% Plot annotated spectrum
+
+
+
+
+annotated=mfin.dropna()
+annotated=annotated[annotated["euclidian_similarity"]>0.75]
+
+
+#% get text sizes
+
+import matplotlib
+from matplotlib.font_manager import findfont, FontProperties
+from PIL import ImageFont, ImageDraw
+
+font = findfont(FontProperties(family=['sans-serif']))
+pfont=ImageFont.truetype(font,size=6)
+
+bbs=[matplotlib.textpath.TextPath((0,0), form, size=10, prop=pfont.getname()[0]).get_extents() 
+      for form in annotated["formula+adduct"].values]    
+annotated[["width","height"]]=np.vstack(bbs)[1::2]
+
+mono_a=annotated[annotated["isotope"]==0]
+
+
+
+
+
+entries=annotated.top_mono_ix.nunique()
+total_height=annotated.groupby('top_mono_ix').nth(0)["height"].sum()
+
+
+#https://python.plainenglish.io/mathematically-optimize-label-positions-in-scatter-plots-207c464de1f9
+#https://python.plainenglish.io/making-line-plots-delightful-with-optimized-direct-labeling-7248cd4fe8cb
+
+
+
+
+
+fig,ax=plt.subplots()
+
+plt.plot(m,i,linewidth=0.2)
+plt.scatter(annotated.mono_mass,annotated.intensity,s=5,color="red",zorder=10,alpha=0.3)
+ax.set_yscale('log')
+ax.spines[['right', 'top']].set_visible(False)
+my=ax.get_yticks()[-1]
+
+ax.vlines(annotated.mono_mass,annotated.intensity,my/2,linestyle="--",color="black",linewidth=0.1)
+plt.xlabel("mz")
+plt.ylabel("Intensity")
+plt.ylim(0,my*2)
+
+bbox = fig.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+fwidth, fheight = bbox.width*fig.dpi, bbox.height*fig.dpi
+axbb=ax.get_position(original=False) #left bottom, width, height
+fyr=fheight*(axbb.ymax-axbb.ymin)
+#https://stackoverflow.com/questions/5320205/matplotlib-text-dimensions
+
+from scipy.optimize import minimize
+from scipy.spatial import distance_matrix
+
+
+# work with normalized positions
+coord_range = annotated.mono_mass.max() - annotated.mono_mass.min()
+point_positions=mono_a.mono_mass.values
+normed_label_positions = point_positions / coord_range
+rel_min_interlabel_distance = mono_a.height.mean()/fwidth*2
+n_pts = normed_label_positions.shape[0]
+label_dist_weight=30.0
+
+def high_when_below(min_value, value):
+    return np.exp(5 * (min_value - value))
+
+def fun_to_minimize(x_1d):
+
+    # a) distances between points and the respective labels
+    label_distance = label_dist_weight * np.sum(
+        (x_1d - normed_label_positions) ** 2
+    )
+    # b) pairwise distances between labels
+    interlabel_dist_matrix = distance_matrix(
+        x_1d.reshape(-1, 1), x_1d.reshape(-1, 1)
+    )
+    interlabel_dist_array = interlabel_dist_matrix[np.triu_indices(n_pts, 1)]
+    interlabel_dist_loss = np.sum(
+        high_when_below(rel_min_interlabel_distance, interlabel_dist_array)
+    )
+
+    return label_distance + interlabel_dist_loss
+
+x_init = normed_label_positions.reshape(-1)
+res = minimize(fun_to_minimize, x_init, method="L-BFGS-B")
+opt_label_positions = res.x * coord_range
+
+
+from PIL import Image
+im = Image.new(mode="P", size=(0, 0))
+draw = ImageDraw.Draw(im)
+
+
+
+gi=annotated.groupby('top_mono_ix')
+c=0
+for n,g in gi:
+  
+
+    logy=np.log10(ax.get_yticks())
+    ycord=np.hstack([0,np.cumsum(np.vstack([draw.textbbox((0, 0), text=i, font=pfont) for i in  g["formula+adduct"].values])[:,2]/1.5)[:-1]])
+    ycord=10**(np.log10(my)+logy[-1]*ycord/fyr)
+
+      
+    for yt in np.arange(len(ycord)):
+        #plt.text(g.mono_mass.values[yt],ycord[yt],g["formula+adduct"].values[yt],rotation=90,rotation_mode = 'anchor',verticalalignment="center",fontsize=10)
+        plt.text(opt_label_positions[c],ycord[yt],g["formula+adduct"].values[yt],
+                 rotation=90,rotation_mode = 'anchor',verticalalignment="center",fontsize=7)
+
+
+        if not yt:
+            plt.plot([g.mono_mass.values[yt],opt_label_positions[c]],
+                     [my/2,ycord[yt]/1.5],color="black",linestyle="--",linewidth=0.25)
+    
+
+    c+=1
+
+#plt.scatter(opt_label_positions,[1e10]*len(opt_label_positions))
+plt.savefig(fs+"_annotated.png",dpi=1000,bbox_inches="tight")
