@@ -11,8 +11,8 @@ import os
 from pathlib import Path
 
 files=[
-"E:/Data/Data_analysis/Skeletons_OrbiSIMS/MFP_GOld_Output/gold_reference_LMIG_orbi_(-)1_all_peaks.csv",
-"E:/Data/Data_analysis/Skeletons_OrbiSIMS/MFP_GOld_Output/gold_reference_GCIB_orbi_(-)1_all_peaks.csv"]
+"gold_reference_LMIG_orbi_(-)1_all_peaks.csv",
+"gold_reference_GCIB_orbi_(-)1_all_peaks.csv"]
 
 cpre=os.path.commonprefix(files)
 csuf=os.path.commonprefix([i[::-1] for i in files])[::-1]
@@ -102,5 +102,6 @@ for r in best[["a","b"]].values:
 
 #add MFP?
 #trim isotopes?
+
 
 
