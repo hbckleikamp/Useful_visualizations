@@ -1,25 +1,25 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Oct 24 12:45:06 2025
-
-@author: e_kle
-"""
 #https://stackoverflow.com/questions/17543359/drawing-lines-between-two-plots-in-matplotlib
 import numpy as np
 import pandas as pd
 import os
 from pathlib import Path
+import textalloc as ta
+import matplotlib.pyplot as plt
+import matplotlib
+
 
 files=[
-"gold_reference_LMIG_orbi_(-)1_all_peaks.csv",
-"gold_reference_GCIB_orbi_(-)1_all_peaks.csv"]
+gold_reference_LMIG_orbi_(-)1_all_peaks.csv",
+gold_reference_GCIB_orbi_(-)1_all_peaks.csv"]
+
+
+top_peaks=10
 
 cpre=os.path.commonprefix(files)
 csuf=os.path.commonprefix([i[::-1] for i in files])[::-1]
 
 
-import matplotlib.pyplot as plt
-import matplotlib
+
 
 
 rows,cols=len(files),1
@@ -35,15 +35,22 @@ for i,f in enumerate(files):
     d["ax"]=i
     ds.append(d)
     
-    x,y=d["Mass"],d["Apex"]
+    x,y=d["Mass"].values,d["Apex"].values
     axes[i].scatter(x,y,color="black")    
     test.append([x[0],y[0]])
     axes[i].set_xlim(0,1000)
-    #axes[i].set_ylabel(Path(f).stem.replace('_all_peaks',""))
-    
     axes[i].set_ylabel(f.replace(cpre,"").replace(csuf,""))
     
-    #find shared parts between stems
+
+    if top_peaks:
+        q=np.argsort(y)[::-1][:top_peaks]
+    
+        #add labels
+        ta.allocate_text(fig,axes[i],
+                          x[q],
+                          y[q],
+                    np.round(x[q],2).astype(str)) 
+        
     
 
     
@@ -96,12 +103,6 @@ for r in best[["a","b"]].values:
     fig.lines.append( matplotlib.lines.Line2D((c1[0],c2[0]),(c1[1],c2[1]),
                                     transform=fig.transFigure,linestyle="--",color="grey",linewidth=1))
 
-#%%
-#add labels to top x most abundant pairs
-#add y-axis labels
-
-#add MFP?
-#trim isotopes?
 
 
 
